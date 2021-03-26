@@ -5,7 +5,7 @@ output:
     keep_md: true
 ---
 
-### Libraries
+#### Libraries
 
 ```r
 library(dplyr)
@@ -71,6 +71,36 @@ message("Mean: ", mean(steps_by_date$steps),
 
 ## What is the average daily activity pattern?
 
+```r
+#The average number of steps taken, averaged across all days 
+mean_steps_interval <- activity %>%
+  select(interval, steps) %>%
+  group_by(interval) %>%
+  summarise(steps = mean(steps, na.rm = TRUE), .groups = "drop")
+
+# Time series plot
+ggplot(mean_steps_interval, aes(x = interval, y = steps)) +
+  geom_line() +
+  labs(x = "5-minute interval",
+       y = "average number of steps",
+       title = "Average daily activity pattern") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
+# Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+max_avg_steps <- mean_steps_interval %>%
+  filter(steps == max(steps)) %>%
+  select(interval) %>%
+  pull()
+message("5-minute interval with max average of steps: ", max_avg_steps)
+```
+
+```
+## 5-minute interval with max average of steps: 835
+```
 
 
 ## Imputing missing values
