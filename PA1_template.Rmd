@@ -58,7 +58,7 @@ mean_steps_interval <- activity %>%
 # Time series plot
 ggplot(mean_steps_interval, aes(x = interval, y = steps)) +
   geom_line() +
-  labs(x = "5-minute interval",
+  labs(x = "minute interval",
        y = "average number of steps",
        title = "Average daily activity pattern") +
   theme(plot.title = element_text(hjust = 0.5))
@@ -123,3 +123,25 @@ message("Mean: ", mean(clean_steps_by_date$steps),
         "\nMedian: ", median(clean_steps_by_date$steps))
 ```
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+clean_activity <- clean_activity %>%
+  mutate(week = weekdays(date, abbreviate = TRUE),
+         week = if_else(week == c("sab", "dom"), 
+                             true = "weekend", 
+                             false = "weekday"),
+         week = as.factor(week)) %>%
+  as_tibble()
+
+clean_steps_by_date <- clean_activity %>%
+  group_by(interval, week) %>%
+  summarise(steps = mean(steps, na.rm = TRUE), .groups = "drop")
+
+ggplot(clean_steps_by_date, aes(x = interval, y = steps)) +
+  geom_line() + 
+  facet_wrap(clean_steps_by_date$week, nrow = 2) +
+  labs(x = "minute interval",
+       y = "average number of steps",
+       title = "Average weekly activity pattern") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
